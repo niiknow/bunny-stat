@@ -1,7 +1,4 @@
 sources:
-  vector_metrics:
-    type: internal_metrics
-
   bunny_log:
     type: syslog
     address: '0.0.0.0:6514'
@@ -16,13 +13,6 @@ transforms:
     condition: 'starts_with(string!(keys(.)[0]), "OptionalBunnyToken")'
 
 sinks:
-  vector_exporter:
-    type: prometheus_exporter
-    inputs:
-      - vector_metrics
-    address: 'prometheus:9598'
-    default_namespace: vector
-
   file_bunny_log:
     type: file
     inputs:
