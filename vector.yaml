@@ -21,6 +21,4 @@ sinks:
     inputs:
       - bunny_log
     compression: none
-    path: /logs/bunny_log-%Y-%m-%d.json
-    encoding:
-      codec: ndjson
+    path: /logs/bunny_log-%Y-%m-%d.log
