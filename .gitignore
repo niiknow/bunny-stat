@@ -1,2 +1,3 @@
-#vector.yaml
-#prometheus.yaml
+data/
+vector.yaml
+prometheus.yaml
