@@ -1,0 +1,39 @@
+version: "3"
+
+networks:
+  bunnynet:
+    driver: bridge
+    external: true
+
+services:
+  openobserve:
+    image: openobserve/openobserve:v0.12.1
+    restart: unless-stopped
+    volumes:
+      - ./data/openb:/data  # Maps the local 'data' directory to '/data' in the container
+    environment:
+      ZO_ROOT_USER_EMAIL: "root@example.com"
+      ZO_ROOT_USER_PASSWORD: "Complexpass#123"
+    ports: ["5080:5080"]
+    networks: [bunnynet]
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    restart: unless-stopped
+    command: --config.file=/etc/prometheus/prometheus.yaml --web.route-prefix=/ --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=90d --web.enable-lifecycle --web.enable-admin-api
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prom:/prometheus
+    networks: [bunnynet]
+
+  vector:
+    image: timberio/vector:0.X-alpine
+    restart: unless-stopped
+    ports: ["8383:8383", "6514:6514/udp"]
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml
+      - ./data/vector:/logs
+    networks: [bunnynet]
+    depends_on: [openobserve, prometheus]

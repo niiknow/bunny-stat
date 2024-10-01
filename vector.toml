@@ -1,0 +1,59 @@
+[sources.vector_metrics]
+type = "internal_metrics"
+
+[sinks.vector_exporter]
+type = "prometheus_exporter"
+inputs = ["vector_metrics"]
+address = "0.0.0.0:9598"
+default_namespace = "vector"
+
+# bunnycdn
+[sources.bunny_log]
+type = "syslog"
+address = "0.0.0.0:6514"
+mode = "udp"
+
+# Reduce logs lines to only those that we care about, in this example use case we only care about those with INFO in them and discard the rest
+#[transforms.prefilter]
+#type = "filter"
+#inputs = ["bunny_log"]
+#condition = { type = "vrl", source = '''contains!(.message,"INFO")''' }
+
+#[transforms.parse_bunny_log]
+#type = "remap"
+#inputs = ["bunny_log"]
+#source = '''
+#    pattern = r'^(?P<remote_addr>[^ ]+) - (?P<remote_user>[^ ]+) \[(?P<time_local>[^\]]+)\] "(?P<request>[^"]+)" (?P<status>\d+) (?P<body_bytes_sent>\d+) (?P<request_time>[\d.]+) "(?P<http_referer>[^"]+)" "(?P<http_user_agent>[^"]+)" "(?P<http_x_forwarded_for>[^"]+)" (?P<trace_id>[^ ]+)$'
+#
+#    . = parse_regex!(.message, pattern)
+#
+#    .timestamp = parse_timestamp!(.time_local, format: "%d/%b/%Y:%H:%M:%S %z")
+#    del(.time_local)
+#
+#    .status = parse_int!(.status)
+#    .body_bytes_sent = parse_int!(.body_bytes_sent)
+#    .request_time = parse_float!(.request_time)
+#    .remote_addr = ip_aton!(.remote_addr)
+#'''
+#
+
+[sinks.file_bunny_log]
+type = "file"
+inputs = [ "bunny_log" ]
+compression = "none"
+path = "/logs/bunny_log-%Y-%m-%d.json"
+encoding.codec = "ndjson"
+
+#[sinks.openobserve_bunny_log]
+#type = "http"
+#inputs = [ "parse_bunny_log" ]
+#uri = "http://openobserve:5080/api/default/bunny_log/_json"
+#method = "post"
+#auth.strategy = "basic"
+#auth.user = "root@example.com"
+#auth.password = "JC9ABuuql7T4JktS"
+#compression = "gzip"
+#encoding.codec = "json"
+#encoding.timestamp_format = "rfc3339"
+#healthcheck.enabled = false
+
