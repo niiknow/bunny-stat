@@ -3,7 +3,6 @@ version: "3"
 networks:
   bunnynet:
     driver: bridge
-    external: true
 
 services:
   openobserve:
@@ -24,7 +23,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
       - ./data/prom:/prometheus
     networks: [bunnynet]
 
