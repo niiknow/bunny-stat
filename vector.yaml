@@ -22,3 +22,5 @@ sinks:
       - bunny_log
     compression: none
     path: /logs/bunny_log-%Y-%m-%d.log
+    encoding:
+      codec: raw_message
