@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
     ports: ["8383:8383", "6514:6514/udp"]
     volumes:
-      - ./vector.toml:/etc/vector/vector.toml
+      - ./vector.yaml:/etc/vector/vector.yaml
       - ./data/vector:/logs
     networks: [bunnynet]
     depends_on: [openobserve, prometheus]
