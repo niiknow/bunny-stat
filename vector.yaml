@@ -7,19 +7,26 @@ sources:
     address: '0.0.0.0:6514'
     mode: udp
 
+transforms:
+  # optionally verify bunnycdn token/password
+  bunny_log_filter:
+    type: filter
+    inputs:
+      - bunny_log
+    condition: 'starts_with(string!(keys(.)[0]), "OptionalBunnyToken")'
 
 sinks:
   vector_exporter:
     type: prometheus_exporter
     inputs:
       - vector_metrics
-    address: '0.0.0.0:9598'
+    address: 'prometheus:9598'
     default_namespace: vector
 
   file_bunny_log:
     type: file
     inputs:
-      - bunny_log
+      - bunny_log_filter
     compression: none
     path: /logs/bunny_log-%Y-%m-%d.log
     encoding:
