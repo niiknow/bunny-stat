@@ -88,6 +88,7 @@ transforms:
         msg.ea = paths[3] || ""
         msg.el = paths[4] || ""
         msg.ev = 1
+        msg.ed = msg.query.ed || ""
 
         if (match!(parts.query.ev || "", r'^[0-9]+$')) {
           msg.ev = parse_int!(parts.query.ev)
