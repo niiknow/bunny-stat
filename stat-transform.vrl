@@ -1,0 +1,32 @@
+.request_type = ""
+
+# BunnyCDN sends BOM character so make sure to strip or fail parse_json
+msg2 = strip_whitespace(string!(.message) || "")
+msg2 = replace(msg2, r'[\uFEFF-\uFFFF]', "")
+msg = parse_json!(msg2)
+pnq = string!(msg.PathAndQuery || "/")
+if (starts_with(pnq, "/shake")) {
+# log(pnq)
+uri = "http://x{{ pnq }}"
+parts = parse_url!(uri)
+msg.query = parts.query || {}
+path = replace(replace(downcase!(parts.path), r'[^a-z0-9-/\?]+', "-"), r'-+', "-")
+paths = split(path, "/")
+msg.ec = paths[2] || ""
+msg.ea = paths[3] || ""
+msg.el = paths[4] || ""
+msg.ev = 1
+msg.ed = msg.query.ed || ""
+
+if (match!(parts.query.ev || "", r'^[0-9]+$')) {
+    msg.ev = parse_int!(parts.query.ev)
+}
+.request_type = "shaker"
+}
+del(.message)
+
+ts = msg.Timestamp
+del(msg.Timestamp)
+msg._timestamp = ts
+msg.timestamp = from_unix_timestamp!(ts, unit: "milliseconds")
+.message = msg

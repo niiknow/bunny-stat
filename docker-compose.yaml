@@ -35,6 +35,7 @@ services:
     ports: ["6514:6514/udp", "9598:9598"]
     volumes:
       - ./data/vector.yaml:/etc/vector/vector.yaml
+      - ./data/stat-transform.vrl:/etc/vector/stat-transform.vrl
       - ./data/vector:/logs
     environment:
       SEARCH_EMAIL: ${SEARCH_EMAIL}
