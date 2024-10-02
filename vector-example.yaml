@@ -25,6 +25,8 @@ sinks:
       user: "${SEARCH_EMAIL:?search email is required}"
       password: "${SEARCH_PWD:?search pwd is required}"
     compression: gzip
+    batch:
+      timeout_secs: 10
     encoding:
       codec: json
       #timestamp_format: rfc3339
@@ -35,8 +37,8 @@ sinks:
     type: prometheus_exporter
     inputs:
       - bunny_metric
-    # address: 0.0.0.0:9598 # this is default
     default_namespace: bunny
+    # address: 0.0.0.0:9598 # this is already default
 
   # alternate to bunny_metric_exporter above
   # bunny_metric_sink:
@@ -49,6 +51,9 @@ sinks:
   #     strategy: basic
   #     user: "${PROM_USER:?prometheus user is required}"
   #     password: "${PROM_PWD:?prometheus pwd is required}"
+  #  compression: gzip
+  #  batch:
+  #    timeout_secs: 10
 
 transforms:
   # optionally verify bunnycdn token/password
@@ -94,8 +99,8 @@ transforms:
 
       ts = msg.Timestamp
       del(msg.Timestamp)
-      msg.timestamp = ts
-      msg.created = from_unix_timestamp!(ts, unit: "milliseconds")
+      msg._timestamp = ts
+      msg.timestamp = from_unix_timestamp!(ts, unit: "milliseconds")
       .message = msg
 
   bunny_shaker:
@@ -113,6 +118,7 @@ transforms:
         field: message.ev
         name: "event_{{ message.ec }}"
         namespace: bunny
+        _timestamp: message._timestamp
         tags:
           action: "{{ message.ea }}"
           label: "{{ message.el }}"
