@@ -62,7 +62,7 @@ transforms:
     type: filter
     inputs:
       - bunny_src
-    condition: 'starts_with(string!(keys(.)[0]), "${BUNNY_TOKEN:?bunnycdn token is required}")'
+    condition: 'starts_with(string!(keys(.)[0]), get_env_var!("BUNNY_TOKEN"))'
 
   # parse log PathAndQuery for /shake aka tree shaking
   # to get event Action(ea), Category (ec), and Value (ev)
