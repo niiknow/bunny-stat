@@ -64,23 +64,23 @@ transforms:
       msg2 = strip_whitespace(string!(.message) || "")
       msg2 = replace(msg2, r'[\uFEFF-\uFFFF]', "")
       msg = parse_json!(msg2)
-      pnq = msg.PathAndQuery
-      if (starts_with!(pnq, "/shake")) {
+      pnq = string!(msg.PathAndQuery || "/")
+      if (starts_with(pnq, "/shake")) {
         # log(pnq)
-        pnq = replace(replace(downcase!(pnq), r'[^a-z0-9-/\?]+', "-"), r'-+', "-")
-        parts = split(pnq, "?")
-        path = parts[0]
-        querystring = parts[1]
-        paths = split!(path, "/")
-        msg.ea = paths[3] || ""
+        uri = "http://x{{ pnq }}"
+        parts = parse_url!(uri)
+        msg.query = parts.query
+        path = replace(replace(downcase!(parts.path), r'[^a-z0-9-/\?]+', "-"), r'-+', "-")
+        paths = split(path, "/")
         msg.ec = paths[2] || ""
+        msg.ea = paths[3] || ""
+        msg.el = paths[4] || ""
         msg.ev = 1
-        msg.query = parse_query_string!(querystring)
-        .request_type = "shaker"
 
-        if (match!(paths[4] || "", r'^[0-9]+$')) {
-          msg.ev = parse_int!(paths[4])
+        if (match!(parts.query.ev || "", r'^[0-9]+$')) {
+          msg.ev = parse_int!(parts.query.ev)
         }
+        .request_type = "shaker"
       }
       del(.message)
       .message = msg
@@ -98,8 +98,8 @@ transforms:
     metrics:
       - type: counter
         field: message.ev
-        name: "event_{{ message.ec }}_{{ message.ea }}"
+        name: "event_{{ message.ec }}"
         tags:
-          category: "{{ message.ec }}"
           action: "{{ message.ea }}"
+          label: "{{ message.el }}"
           value: "{{ message.ev }}"
