@@ -32,7 +32,7 @@ services:
   vector:
     image: timberio/vector:0.X-alpine
     restart: unless-stopped
-    ports: ["8383:8383", "6514:6514/udp"]
+    ports: ["6514:6514/udp", "9598:9598"]
     volumes:
       - ./vector.yaml:/etc/vector/vector.yaml
       - ./data/vector:/logs
@@ -41,5 +41,6 @@ services:
       SEARCH_PWD: ${SEARCH_PWD}
       PROM_USER: ${PROM_USER}
       PROM_PWD: ${PROM_PWD}
+      BUNNY_TOKEN: ${BUNNY_TOKEN}
     networks: [bunnynet]
     depends_on: [openobserve, prometheus]

@@ -31,16 +31,24 @@ sinks:
     healthcheck:
       enabled: false
 
-  bunny_metric_sink:
-    type: prometheus_remote_write
+  bunny_metric_exporter:
+    type: prometheus_exporter
     inputs:
       - bunny_metric
-    endpoint: "http://prometheus:9090/api/v1/write"
-    default_namespace: "bunny"
-    auth:
-      strategy: basic
-      user: "${PROM_USER:?prometheus user is required}"
-      password: "${PROM_PWD:?prometheus pwd is required}"
+    # address: 0.0.0.0:9598 # this is default
+    default_namespace: bunny
+
+  # alternate to bunny_metric_exporter above
+  # bunny_metric_sink:
+  #   type: prometheus_remote_write
+  #   inputs:
+  #     - bunny_metric
+  #   endpoint: "http://prometheus:9090/api/v1/write"
+  #   default_namespace: bunny
+  #   auth:
+  #     strategy: basic
+  #     user: "${PROM_USER:?prometheus user is required}"
+  #     password: "${PROM_PWD:?prometheus pwd is required}"
 
 transforms:
   # optionally verify bunnycdn token/password
@@ -83,8 +91,11 @@ transforms:
         .request_type = "shaker"
       }
       del(.message)
-      msg._timestamp = msg.Timestamp
-      msg.Timestamp = from_unix_timestamp!(msg.Timestamp, unit: "milliseconds")
+
+      ts = msg.Timestamp
+      del(msg.Timestamp)
+      msg.timestamp = ts
+      msg.created = from_unix_timestamp!(ts, unit: "milliseconds")
       .message = msg
 
   bunny_shaker:
@@ -101,6 +112,7 @@ transforms:
       - type: counter
         field: message.ev
         name: "event_{{ message.ec }}"
+        namespace: bunny
         tags:
           action: "{{ message.ea }}"
           label: "{{ message.el }}"
