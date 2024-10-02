@@ -9,7 +9,7 @@ services:
     image: openobserve/openobserve:v0.12.1
     restart: unless-stopped
     volumes:
-      - ./data/openob:/data  # Maps the local 'data' directory to '/data' in the container
+      - ./openob:/data  # Maps the local 'data' directory to '/data' in the container
     environment:
       ZO_ROOT_USER_EMAIL: ${SEARCH_EMAIL}
       ZO_ROOT_USER_PASSWORD: ${SEARCH_PWD}
@@ -24,9 +24,9 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./data/prometheus.yaml:/etc/prometheus/prometheus.yaml
-      - ./data/web.yaml:/etc/prometheus/web.yaml
-      - ./data/prom:/prometheus
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./web.yaml:/etc/prometheus/web.yaml
+      - ./prom:/prometheus
     networks: [bunnynet]
 
   vector:
@@ -34,9 +34,9 @@ services:
     restart: unless-stopped
     ports: ["6514:6514/udp", "9598:9598"]
     volumes:
-      - ./data/vector.yaml:/etc/vector/vector.yaml
-      - ./data/stat-transform.vrl:/etc/vector/stat-transform.vrl
-      - ./data/vector:/logs
+      - ./vector.yaml:/etc/vector/vector.yaml
+      - ./stat-transform.vrl:/etc/vector/stat-transform.vrl
+      - ./vector:/logs
     environment:
       SEARCH_EMAIL: ${SEARCH_EMAIL}
       SEARCH_PWD: ${SEARCH_PWD}
