@@ -27,7 +27,7 @@ sinks:
     compression: gzip
     encoding:
       codec: json
-      timestamp_format: rfc3339
+      #timestamp_format: rfc3339
     healthcheck:
       enabled: false
 
@@ -83,6 +83,8 @@ transforms:
         .request_type = "shaker"
       }
       del(.message)
+      msg._timestamp = msg.Timestamp
+      msg.Timestamp = from_unix_timestamp!(msg.Timestamp, unit: "milliseconds")
       .message = msg
 
   bunny_shaker:
