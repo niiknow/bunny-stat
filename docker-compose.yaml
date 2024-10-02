@@ -11,8 +11,8 @@ services:
     volumes:
       - ./data/openob:/data  # Maps the local 'data' directory to '/data' in the container
     environment:
-      ZO_ROOT_USER_EMAIL: "root@example.com"
-      ZO_ROOT_USER_PASSWORD: "Complexpass#123"
+      ZO_ROOT_USER_EMAIL: ${SEARCH_EMAIL}
+      ZO_ROOT_USER_PASSWORD: ${SEARCH_PWD}
     ports: ["5080:5080"]
     networks: [bunnynet]
 
@@ -35,5 +35,8 @@ services:
     volumes:
       - ./vector.yaml:/etc/vector/vector.yaml
       - ./data/vector:/logs
+    environment:
+      SEARCH_EMAIL: ${SEARCH_EMAIL}
+      SEARCH_PWD: ${SEARCH_PWD}
     networks: [bunnynet]
     depends_on: [openobserve, prometheus]

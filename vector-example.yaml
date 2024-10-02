@@ -1,24 +1,105 @@
 sources:
-  bunny_log:
+  bunny_src:
     type: syslog
     address: '0.0.0.0:6514'
     mode: udp
 
-transforms:
-  # optionally verify bunnycdn token/password
-  # password going to come in as the event object key: OptionalBunnyToken@workerid
-  bunny_log_filter:
-    type: filter
-    inputs:
-      - bunny_log
-    condition: 'starts_with(string!(keys(.)[0]), "OptionalBunnyToken@")'
-
 sinks:
-  file_bunny_log:
+  bunny_file_sink:
     type: file
     inputs:
-      - bunny_log_filter
+      - bunny_transform
     compression: none
     path: /logs/bunny_log-%Y-%m-%d.log
     encoding:
       codec: raw_message
+
+  bunny_search_sink:
+    type: http
+    inputs:
+      - bunny_shaker
+    uri: 'http://openobserve:5080/api/default/bunny_log/_json'
+    method: post
+    auth:
+      strategy: basic
+      user: "${SEARCH_EMAIL:?search email is required}"
+      password: "${SEARCH_PWD:?search pwd is required}"
+    compression: gzip
+    encoding:
+      codec: json
+      timestamp_format: rfc3339
+    healthcheck:
+      enabled: false
+
+  bunny_metric_sink:
+    type: prometheus_remote_write
+    inputs: 
+      - bunny_metric
+    endpoint: "http://prometheus:9090/api/v1/write"
+    default_namespace: "bunny"
+    auth:
+      strategy: basic
+      user: "${PROM_USER:?prometheus user is required}"
+      password: "${PROM_USER:?prometheus pwd is required}"
+
+transforms:
+  # optionally verify bunnycdn token/password
+  # password going to come in as the event object key: OptionalBunnyToken@workerid
+  bunny_prefilter:
+    type: filter
+    inputs:
+      - bunny_src
+    condition: 'starts_with(string!(keys(.)[0]), "${BUNNY_TOKEN:?bunnycdn token is required}@")'
+
+  # parse log PathAndQuery for /shake aka tree shaking
+  # to get event Action(ea), Category (ec), and Value (ev)
+  bunny_transform:
+    type: remap
+    inputs:
+      - bunny_prefilter
+    source: |
+      .request_type = ""
+
+      # BunnyCDN sends BOM character so make sure to strip or fail parse_json
+      msg2 = strip_whitespace(string!(.message) || "")
+      msg2 = replace(msg2, r'[\uFEFF-\uFFFF]', "")
+      msg = parse_json!(msg2)
+      pnq = msg.PathAndQuery
+      if (starts_with!(pnq, "/shake")) {
+        # log(pnq)
+        pnq = replace(replace(downcase!(pnq), r'[^a-z0-9-/\?]+', "-"), r'-+', "-")
+        parts = split(pnq, "?")
+        path = parts[0]
+        querystring = parts[1]
+        paths = split!(path, "/")
+        msg.ea = paths[3] || ""
+        msg.ec = paths[2] || ""
+        msg.ev = 1
+        msg.query = parse_query_string(querystring)
+        .request_type = "shaker"
+
+        if (match!(paths[4] || "", r'^[0-9]+$')) {
+          msg.ev = parse_int!(paths[4])
+        }
+      }
+      del(.message)
+      .message = msg
+
+  bunny_shaker:
+    type: filter
+    inputs:
+      - bunny_transform
+    condition: .request_type == "shaker"
+
+  bunny_metric:
+    type: log_to_metric
+    inputs: 
+      - bunny_shaker
+    metrics:
+      - type: counter
+        field: message.ev
+        name: "event_{{ message.ec }}_{{ message.ea }}"
+        tags:
+          category: "{{ message.ec }}"
+          action: "{{ message.ea }}"
+          value: "{{ message.ev }}"

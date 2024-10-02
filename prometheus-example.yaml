@@ -16,21 +16,16 @@ rule_files:
   # - "first_rules.yml"
   # - "second_rules.yml"
 
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
-scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: "prometheus"
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
-    static_configs:
-      - targets: ["0.0.0.0:9090"]
-
 # Remote write configuration
 remote_write:
   - url: 'http://openobserve:5080/api/default/prometheus/api/v1/write'
     basic_auth:
-      username: 'root@example.com'
+      username: 'friends@niiknow.org'
       password: 'Complexpass#123'
+
+# Usernames and hashed passwords that have full access to the web
+# server via basic authentication. If empty, no basic authentication is
+# required. Passwords are hashed with bcrypt.
+basic_auth_users:
+  friends: $2b$12$/Wq7mRwo8WGX0T3HIuHlD.9oeWlCxuOMMUiSmtk3aWohlAUY1yQOK
+

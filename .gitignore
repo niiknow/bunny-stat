@@ -1,3 +1,4 @@
 data/
 vector.yaml
 prometheus.yaml
+.env
