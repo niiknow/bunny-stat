@@ -28,8 +28,7 @@ sinks:
     batch:
       timeout_secs: 10
     encoding:
-      codec: json
-      #timestamp_format: rfc3339
+      codec: raw_message
     healthcheck:
       enabled: false
 
