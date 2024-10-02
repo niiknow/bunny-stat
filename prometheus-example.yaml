@@ -22,10 +22,3 @@ remote_write:
     basic_auth:
       username: 'friends@niiknow.org'
       password: 'Complexpass#123'
-
-# Usernames and hashed passwords that have full access to the web
-# server via basic authentication. If empty, no basic authentication is
-# required. Passwords are hashed with bcrypt.
-basic_auth_users:
-  friends: $2b$12$/Wq7mRwo8WGX0T3HIuHlD.9oeWlCxuOMMUiSmtk3aWohlAUY1yQOK
-
