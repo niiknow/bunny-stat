@@ -70,7 +70,7 @@ transforms:
     type: remap
     inputs:
       - bunny_prefilter
-    file: /etc/vector/bunny.vrl
+    file: /etc/vector/stat-transform.vrl
 
   bunny_shaker:
     type: filter
