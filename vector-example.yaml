@@ -40,7 +40,7 @@ sinks:
     auth:
       strategy: basic
       user: "${PROM_USER:?prometheus user is required}"
-      password: "${PROM_USER:?prometheus pwd is required}"
+      password: "${PROM_PWD:?prometheus pwd is required}"
 
 transforms:
   # optionally verify bunnycdn token/password
