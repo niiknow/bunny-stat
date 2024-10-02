@@ -1,4 +1,5 @@
-data/
-vector.yaml
-prometheus.yaml
 .env
+prometheus.yaml
+vector.yaml
+web.yaml
+data/
