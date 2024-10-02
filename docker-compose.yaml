@@ -41,6 +41,5 @@ services:
       SEARCH_PWD: ${SEARCH_PWD}
       PROM_USER: ${PROM_USER}
       PROM_PWD: ${PROM_PWD}
-      BUNNY_TOKEN: ${BUNNY_TOKEN}
     networks: [bunnynet]
     depends_on: [openobserve, prometheus]
