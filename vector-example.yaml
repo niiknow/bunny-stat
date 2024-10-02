@@ -81,7 +81,7 @@ transforms:
         # log(pnq)
         uri = "http://x{{ pnq }}"
         parts = parse_url!(uri)
-        msg.query = parts.query
+        msg.query = parts.query || {}
         path = replace(replace(downcase!(parts.path), r'[^a-z0-9-/\?]+', "-"), r'-+', "-")
         paths = split(path, "/")
         msg.ec = paths[2] || ""
@@ -122,3 +122,4 @@ transforms:
           action: "{{ message.ea }}"
           label: "{{ message.el }}"
           value: "{{ message.ev }}"
+          desc: "{{ message.query.ed }}"
