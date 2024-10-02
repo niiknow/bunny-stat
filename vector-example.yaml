@@ -75,7 +75,7 @@ transforms:
         msg.ea = paths[3] || ""
         msg.ec = paths[2] || ""
         msg.ev = 1
-        msg.query = parse_query_string(querystring)
+        msg.query = parse_query_string!(querystring)
         .request_type = "shaker"
 
         if (match!(paths[4] || "", r'^[0-9]+$')) {
