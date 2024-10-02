@@ -40,6 +40,7 @@ sinks:
     # address: 0.0.0.0:9598 # this is already default
 
   # alternate to bunny_metric_exporter above
+  # remember to update docker-compose.yaml command with --web.enable-remote-write-receiver
   # bunny_metric_sink:
   #   type: prometheus_remote_write
   #   inputs:

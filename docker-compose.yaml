@@ -20,12 +20,12 @@ services:
     image: prom/prometheus:v2.54.1
     user: root
     restart: unless-stopped
-    command: --config.file=/etc/prometheus/prometheus.yaml --web.config.file=/etc/prometheus/web.yaml --web.route-prefix=/ --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=90d --web.enable-lifecycle --web.enable-admin-api --web.enable-remote-write-receiver
+    command: --config.file=/etc/prometheus/prometheus.yaml --web.config.file=/etc/prometheus/web.yaml --web.route-prefix=/ --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=90d --web.enable-lifecycle --web.enable-admin-api
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
-      - ./web.yaml:/etc/prometheus/web.yaml
+      - ./data/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./data/web.yaml:/etc/prometheus/web.yaml
       - ./data/prom:/prometheus
     networks: [bunnynet]
 
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     ports: ["6514:6514/udp", "9598:9598"]
     volumes:
-      - ./vector.yaml:/etc/vector/vector.yaml
+      - ./data/vector.yaml:/etc/vector/vector.yaml
       - ./data/vector:/logs
     environment:
       SEARCH_EMAIL: ${SEARCH_EMAIL}
