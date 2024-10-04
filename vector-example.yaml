@@ -37,6 +37,7 @@ sinks:
     inputs:
       - bunny_metric
     default_namespace: bunny
+    flush_period_secs: 20
     # address: 0.0.0.0:9598 # this is already default
 
   # alternate to bunny_metric_exporter above
@@ -92,4 +93,3 @@ transforms:
           action: "{{ message.ea }}"
           label: "{{ message.el }}"
           value: "{{ message.ev }}"
-          desc: "{{ message.query.ed }}"
