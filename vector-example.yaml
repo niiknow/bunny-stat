@@ -41,20 +41,18 @@ sinks:
     # address: 0.0.0.0:9598 # this is already default
 
   # alternate to bunny_metric_exporter above
-  # remember to update docker-compose.yaml command with --web.enable-remote-write-receiver
-  # bunny_metric_sink:
-  #   type: prometheus_remote_write
-  #   inputs:
-  #     - bunny_metric
-  #   endpoint: "http://prometheus:9090/api/v1/write"
-  #   default_namespace: bunny
-  #   auth:
-  #     strategy: basic
-  #     user: "${PROM_USER:?prometheus user is required}"
-  #     password: "${PROM_PWD:?prometheus pwd is required}"
-  #  compression: gzip
-  #  batch:
-  #    timeout_secs: 10
+  bunny_metric_sink:
+    type: prometheus_remote_write
+    inputs:
+      - bunny_metric
+    endpoint: "http://openobserve:5080/api/default/prometheus/api/v1/write"
+    default_namespace: bunny
+    auth:
+      strategy: basic
+      user: "${SEARCH_EMAIL:?search email is required}"
+      password: "${SEARCH_PWD:?search pwd is required}"
+   batch:
+     timeout_secs: 10
 
 transforms:
   # optionally verify bunnycdn token/password

@@ -29,8 +29,12 @@ scrape_configs:
       - targets: ['vector:9598']
 
 # Remote write configuration
-remote_write:
-  - url: 'http://openobserve:5080/api/default/prometheus/api/v1/write'
-    basic_auth:
-      username: 'friends@niiknow.org'
-      password: 'Complexpass#123'
+# This is causing duplicate due to it sending every time scrape happen, moved config to vector.yaml
+#remote_write:
+#  - url: 'http://openobserve:5080/api/default/prometheus/api/v1/write'
+#    basic_auth:
+#      username: 'friends@niiknow.org'
+#      password: 'Complexpass#123'
+#    queue_config:
+#      batch_send_deadline: 60s
+
