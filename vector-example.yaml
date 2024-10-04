@@ -8,15 +8,17 @@ sinks:
   bunny_file_sink:
     type: file
     inputs:
-      - bunny_transform
+      - bunny_shaker
     compression: none
     path: /logs/bunny_log-%Y-%m-%d.log
+    encoding:
+      codec: json
 
   bunny_search_sink:
     type: elasticsearch
     inputs:
       - bunny_shaker
-    endpoints: 'http://openobserve:5080/api/default/'
+    endpoints: [http://openobserve:5080/api/default/]
     bulk:
       index: bunny_log
     auth:
@@ -69,7 +71,7 @@ transforms:
     type: filter
     inputs:
       - bunny_transform
-    condition: .request_type == "shaker"
+    condition: 'starts_with(string!(.PathAndQuery), "/shake/")'
 
   bunny_metric:
     type: log_to_metric
@@ -85,3 +87,4 @@ transforms:
           action: "{{ ea }}"
           label: "{{ el }}"
           value: "{{ ev }}"
+
