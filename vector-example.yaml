@@ -11,24 +11,18 @@ sinks:
       - bunny_transform
     compression: none
     path: /logs/bunny_log-%Y-%m-%d.log
-    encoding:
-      codec: raw_message
 
   bunny_search_sink:
-    type: http
+    type: elasticsearch
     inputs:
       - bunny_shaker
-    uri: 'http://openobserve:5080/api/default/bunny_log/_json'
-    method: post
+    endpoints: 'http://openobserve:5080/api/default/'
+    bulk:
+      index: bunny_log
     auth:
       strategy: basic
       user: "${SEARCH_EMAIL:?search email is required}"
       password: "${SEARCH_PWD:?search pwd is required}"
-    compression: gzip
-    batch:
-      timeout_secs: 10
-    encoding:
-      codec: raw_message
     healthcheck:
       enabled: false
 
@@ -83,11 +77,11 @@ transforms:
       - bunny_shaker
     metrics:
       - type: counter
-        field: message.ev
-        name: "event_{{ message.ec }}"
+        field: ev
+        name: "event_{{ ec }}"
         namespace: bunny
-        _timestamp: message._timestamp
+        _timestamp: _timestamp
         tags:
-          action: "{{ message.ea }}"
-          label: "{{ message.el }}"
-          value: "{{ message.ev }}"
+          action: "{{ ea }}"
+          label: "{{ el }}"
+          value: "{{ ev }}"

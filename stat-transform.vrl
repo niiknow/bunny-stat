@@ -29,4 +29,4 @@ ts = msg.Timestamp
 del(msg.Timestamp)
 msg._timestamp = ts
 msg.timestamp = from_unix_timestamp!(ts, unit: "milliseconds")
-.message = msg
+. = msg
